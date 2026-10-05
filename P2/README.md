@@ -9,11 +9,12 @@ El entorno de ejecución requiere las siguientes librerías:
 - `opencv-python` (`cv2`)
 - `matplotlib`
 - `Pillow`
+- `pygame`
 
 ## Contenido y Tareas Resueltas
 
 ### Tarea 1: Detección de Bordes con Canny y Análisis por Filas
-**Objetivo:** Obtener los contornos de la imagen `mandril.jpg` mediante el detector multicapa de Canny y realizar un análisis cuantitativo de la densidad de bordes por filas.
+**Objetivo:** Obtener los contornos de la imagen `mandril.jpg` mediante el detector multicapa de Canny y realizar un análisis de la densidad de bordes por filas.
 
 **Implementación:**
 1. Se pasa la imagen original a escala de grises.
@@ -35,20 +36,11 @@ El entorno de ejecución requiere las siguientes librerías:
 **Conclusiones (Canny vs Sobel):**
 Mientras que Sobel (tras un umbralizado) produce contornos anchos y muy sensibles al nivel de textura/ruido de la imagen, Canny logra perfilar contornos de un píxel de grosor mucho más limpios gracias a su algoritmo de supresión de no-máximos e histéresis. Sobel extrae la intensidad cruda del gradiente; Canny realiza una interpretación más topológica del borde.
 
-### Tarea 3: Demostrador WebCam - "My Little Piece of Privacy" (Virtual)
-**Objetivo:** Desarrollar un sistema de visión artificial en tiempo real basado en una instalación artística interactiva. En este caso se ha adaptado la obra *[My little piece of privacy]* de Niklas Roy.
+### Tarea 3: Demostrador WebCam - "Censura Selectiva con Feedback Acústico"
+**Objetivo:** Desarrollar un sistema de visión en tiempo real que localiza objetos un color amarillo, pone una cortina encima y reproduce un sonido.
 
 **Implementación:**
-En la instalación original, una cámara detecta la posición de una persona y un motor mueve una cortina física a lo largo de un riel para bloquear el campo de visión, "otorgando privacidad" al sujeto en la ventana.
-
-Nuestro sistema lo replica de manera completamente virtual:
-1. Captura vídeo en tiempo real y aplica `cv2.createBackgroundSubtractorMOG2` para separar el fondo del objeto en movimiento (primer plano).
-2. Se limpia la máscara de movimiento usando algoritmos morfológicos (`cv2.morphologyEx`) de apertura y dilatación.
-3. Se detectan los contornos, aislando el de mayor tamaño para ignorar ruidos menores.
-4. Se extrae el `Bounding Box` (caja delimitadora) de ese contorno y el software dibuja un polígono negro ("cortina virtual") que abarca toda la altura de la pantalla en esa coordenada X, acompañando continuamente al usuario e impidiendo que la cámara renderice su cuerpo.
-
-## Ejecución
-Para visualizar los gráficos estáticos y probar el demostrador de la webcam, simplemente ejecuta:
-
-```bash
-python tareas_vision.py
+1. Se utiliza el espacio de color `HSV` para independizar el matiz de la luminosidad y generar una máscara binaria estable.
+2. Mediante transformaciones morfológicas (`cv2.morphologyEx`) se eliminan falsos positivos y ruido ambiental.
+3. Al detectar un área superior al umbral establecido, el algoritmo dibuja una cortina de censura guiada por el `Bounding Box` del contorno dominante.
+4. **Integración Asíncrona:** Utilizando la librería `pygame`, el sistema dispara un evento de audio local. Para mantener los FPS estables y evitar el solapamiento del búfer de audio, se implementa un control de estados (`pygame.mixer.get_busy()`) que verifica la disponibilidad del canal antes de lanzar el hilo de reproducción.
