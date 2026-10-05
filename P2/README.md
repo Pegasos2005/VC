@@ -1,5 +1,9 @@
 # Práctica de Procesamiento de Imagen y Visión Artificial con OpenCV
 
+## GitHub Autores:
+Tomás: https://github.com/Pegasos2005
+Helen: https://github.com/heleengb
+
 Este repositorio contiene las soluciones a varias tareas de procesamiento de imágenes y vídeo en tiempo real utilizando Python, `OpenCV` y `matplotlib`. El objetivo principal es la comprensión y aplicación de filtros de detección de bordes y técnicas de sustracción de fondo.
 
 ## Requisitos y Dependencias
