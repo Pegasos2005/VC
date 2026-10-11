@@ -1,54 +1,110 @@
-## Práctica 3. Detección y reconocimiento de formas
+# Práctica 3 – Visión por Computador
 
-### Contenidos
+Detección de monedas y clasificación de microplásticos con OpenCV, **sin aprendizaje profundo**.
 
-[Aspectos cubiertos](#31-aspectos-cubiertos)  
-[Entrega](#32-entrega)
+## Contenido
 
-### 3.1. Aspectos cubiertos
+| Archivo | Descripción |
+|---|---|
+| `VC_P3_resuelto.ipynb` | Notebook de la práctica con las celdas originales y las soluciones de las dos tareas |
+| `README.md` | Este documento |
 
-En esta práctica el objetivo es adquirir nociones para extraer información geométrica de objetos presentes en una imagen, con el fin de caracterizarlos y posteriormente ser capaz de identificarlos de forma automática en categorías. Si bien se reitera en el apartado de la entgera, **no se plantea** para la resolución de las tareas, la utilización de **modelos de aprendizaje profundo**. El cuaderno de la práctica, *VC_P3.ipynb*, contiene diversos ejemplos mostrando variantes para la detección de objetos presentes en la imagen, como paso previo a su caracterización geométrica. En este sentido, se plantea el uso del umbralizado y la detección de contornos. Para el caso concreto de monedas, se considera también la utilización de la transformada de Hough para la localización de formas circulares.
+Archivos de datos necesarios, en la misma carpeta que el notebook: `Monedas.jpg`, `MPs_test.jpg`, `MPs_test_bbs.csv`, `FRA.png`, `PEL.png`, `TAR.png`.
 
-
-Si bien no es necesario instalar paquetes adicionales para las primeras celdas del cuaderno, de cara a poder obtener la matriz de confusión, es requisito instalar en el *environment* los paquetes *scikit-learn* y *seaborn* para disponer de utilidades para el cálculo de [métricas](https://developers.google.com/machine-learning/crash-course/classification/accuracy-precision-recall?hl=es-419). Con *pip* sería algo como:
+## Requisitos
 
 ```
-pip install scikit-learn seaborn
+pip install opencv-python numpy matplotlib seaborn scikit-learn
 ```
 
-### 3.2. Entrega
+Ejecutar las celdas en orden. Las ventanas de OpenCV (clic y cámara) necesitan entorno gráfico local.
 
-Para la entrega de esta práctica, son **dos las tareas planteadas**. Para ninguna de ellas deben integrar modelos de **aprendizaje profundo**:
+---
 
-- En la **primera tarea**, el reto o tarea consiste en determinar la cantidad de dinero y monedas presentes en la imagen captada en vivo con la webcam. Una extensión válida sería la presencia de objetos que no sean monedas en la imagen analizada.
+## Tarea 1: Dinero en la imagen de monedas
 
-- En la **segunda tarea**, deben desarrollar un procedimiento que extraiga partículas de una imagen de test, y las clasifique en tres clases posibles. Deben tener claro que la imagen de test no puede utilizarse para ajustar el procedimiento, para ello cuentan con las imágenes de entrenamiento. En este sentido, además de la imagen de test *MPs_test.jpg* con su correspondiente archivo de anotaciones *MPs_test_bbs.csv*, se proporcionan de cara al entrenamiento, imágenes de tres clases de objetos recogidos en playas canarias: fragmentos plásticos, *pellets* y alquitrán. Para cada categoría se proporciona una imagen completa y una subimagen de la misma. Las dos primeras categorías se consideran microplásticos cuando miden menos de 5mm, mientras que la tercera es muy habitual encontrarlas en playas canarias. Observar que dado que cada imagen contiene muestras de una única categoría, a efectos prácticos disponen de un conjunto de datos anotado. La tarea propuesta consiste en hacer uso de las imágenes de entrenamiento proporcionadas, extraer de forma automatizada las partículas e identificar patrones en sus características geométricas y de apariencia o entrenar un clasificador con ellas, que puedan permitir la clasificación de las partículas en la imagen de test. El resultado obtenido en la imagen de test, debe mostrarse por medio las métricas mostradas en el cuaderno, incluyendo la matriz de confusión, donde se comparan las anotaciones con las predicciones.
+### Método
+1. **Mapa de diferencia con el fondo** (`mapa_diferencia`): el color de fondo se estima con una mediana grande sobre una versión reducida de la imagen (aguanta degradados de luz) y cada píxel vale cuánto se aleja de ese fondo. Así da igual que las monedas sean más claras u oscuras.
+2. **Detección** (`detectar_monedas`): se binariza el mapa con varios umbrales, del estricto (Otsu) al laxo (el estricto separa monedas vecinas con sombra y el laxo recupera las poco contrastadas). En cada uno se buscan círculos por **contornos** (con filtro de circularidad) y con la **Transformada de Hough** sobre la máscara (encuentra las que se tocan o solapan). Cada moneda se queda con la primera vez que aparece.
+3. **Afinado y validación** (`refinar_circulo`): se mide el borde real de cada moneda (máxima caída del mapa de diferencia en 90 direcciones) y se ajusta un círculo por mínimos cuadrados con la mediana, así no afectan sombras ni monedas vecinas. Si no hay borde suficiente alrededor, se descarta como falso positivo.
+4. **Calibración** (`pedir_clic`, `calibrar`): el usuario hace clic sobre una moneda de 1 €, cuyo diámetro real es 23.25 mm. `mm_por_píxel = 23.25 / (2 · radio_px)`. Si el clic no funciona en tu entorno, el notebook permite elegir la moneda por su número.
+5. **Clasificación** (`clasificar_moneda`): se pasa el diámetro de cada moneda a mm y se asigna al valor con diámetro real más cercano. Si la diferencia supera 1.5 mm, se marca como `?` y no suma.
+6. **Suma** (`procesar_monedas`): se dibuja cada moneda con su valor y se suma el total.
 
-![Confusión](MatrizConfu.png)  
-*Ejemplo de matriz de confusión*
+Si la segmentación no es buena, `detectar_monedas(img, umbral=40)` fija el umbral a mano (0-255).
 
-A la hora de considerar posibles características geométricas, como punto de partida para la extracción de descriptores de las partículas, se proporciona enlace al trabajo [SMACC: A System for Microplastics Automatic Counting and Classification](https://doi.org/10.1109/ACCESS.2020.2970498) en el que se adoptan algunas propiedades geométricas para dicho fin. De forma resumida, las características geométricas utilizadas en dicho trabajo fueron:
+Diámetros usados (mm): 1 c = 16.25, 2 c = 18.75, 5 c = 21.25, 10 c = 19.75, 20 c = 22.25, 50 c = 24.35 (valor del enunciado), 1 € = 23.25, 2 € = 25.75.
 
-- Área en píxeles (A)
-- Perímetro en píxeles (P)
-- Compacidad (relación del cuadrado del perímetro con el área C=P^2/A)
-- Relación del área de la partícula con el área del contenedor que la contiene
-- Relación del ancho y el alto del contenedor
-- Relación entre los ejes de la elipse ajustada
-- Definido el centroide, relación entre las distancias menor y mayor al contorno
+### Demostrador en vivo (`demo_camara`)
+Reutiliza las mismas funciones sobre cada fotograma de la cámara.
 
-En relación a la segmentación de las partículas, una probable primera observación es que la aplicación del umbralizado para separarlas del fondo, es delicada. Preprocesamiento como el ecualizado del histograma, suavizar la imagen de entrada o reducir su tamaño, o aplicar heurísticas basadas en el tamaño mínimo y máximo de los contornos localizados, y la distancia mínima entre ellos, pueden ayudar a filtrar falsas detecciones, pero a pesar de ello, será un desafío obtener una separación perfecta para todas las imágenes con la misma estrategia. Añadir, que la imagen de fragmentos contiene unas 80 partículas, la de *pellets* unas 55 y la de alquitrán unas 54.
+| Control | Acción |
+|---|---|
+| Clic en una moneda de 1 € | Calibra la escala |
+| `r` | Borra la calibración |
+| `b` | Ver / ocultar la segmentación |
+| `+` / `-` | Fijar el umbral a mano y subirlo / bajarlo (`a` = automático) |
+| `q` / `ESC` | Salir |
 
-<!--
-![Contornos](Output.jpg)  
-*Ejemplo ilustrativo contornos detectados en la imagen de fragmentos*
+Tras calibrar: verde = moneda reconocida, rojo con `?` = no encaja con ninguna moneda. El total se muestra arriba a la izquierda.
 
-Si quieren ir más allá, sugerir explorar técnicas de segmentación recientes y potentes como [Segment anything o SAM](https://segment-anything.com) o [OneFormer](https://github.com/SHI-Labs/OneFormer), y extensiones como , [SAM 2](https://github.com/facebookresearch/segment-anything-2), [FastSAM](https://github.com/CASIA-IVA-Lab/FastSAM) o [Count anything](https://github.com/ylqi/Count-Anything). No duden en compartir otras alternativas que descubran.-->
+### ¿Funciona? Problemas observados
+- **Perspectiva y distancia:** la escala solo es válida si todas las monedas están a la misma distancia que la de referencia y la cámara es perpendicular a la mesa. Si la cámara se mueve hay que recalibrar.
+- **Diámetros parecidos:** 20 c (22.25), 1 € (23.25) y 50 c (24.35) difieren ~1 mm; con poca resolución o borde ruidoso se confunden. El color (cobre / dorado / bimetálico) mejoraría la clasificación.
+- **Iluminación:** sombras y reflejos alteran el contorno y, con él, el diámetro medido.
+- **Objetos que no son monedas:** los no redondos se descartan por circularidad; los redondos de tamaño parecido a una moneda se contarán como moneda; los de otro tamaño salen con `?`.
+- **Solape:** dos monedas que se tocan forman un único contorno no circular y no se cuentan. Alternativas: Transformada de Hough o *watershed*.
+- **Fondo:** necesita contraste con las monedas. Monedas de cobre sobre madera es un caso difícil; un folio blanco o superficie lisa oscura funciona mucho mejor.
+- **Resolución:** si las monedas ocupan pocos píxeles, 1 px de error son varias décimas de mm y se confunden las de tamaño parecido.
 
-Como en las prácticas previas, la entrega se realizará a través del campus virtual, remitiendo un enlace al repositorio **github**, donde se alojará el **cuaderno o cuadernos** de resolución de las tareas, además de su correspondiente **README** describiendo el proceso adoptado para resolver cada tarea, detallar la asistencia recibida por herramientas de IA, integrando de imágenes ilustrativas, además de las métricas obtenidas y matriz de confusión de la segunda tarea.
+> Nota: estas observaciones se basan en las limitaciones del método. Conviene contrastarlas y ampliarlas con las pruebas reales con la cámara.
 
-<!---Momentos en trabajo de Nayar sobre Binary images https://cave.cs.columbia.edu/Statics/monographs/Binary%20Images%20FPCV-1-3.pdf -->
+---
 
+## Tarea 2: Clasificación de microplásticos (FRA / PEL / TAR)
 
-***
-Bajo licencia de Creative Commons Reconocimiento - No Comercial 4.0 Internacional
+### Pipeline
+1. **Segmentación** (`segmentar_particulas`): se estima el color de fondo como la mediana de la imagen (las partículas son minoría), se mide la distancia de cada píxel a ese color y se aplica Otsu. Así funciona igual con partículas más claras u oscuras que el fondo. Después, morfología y contornos externos con un área mínima (`AREA_MIN_MP`, a ajustar según la resolución). Hay otros dos métodos seleccionables con `METODO_SEG`: `'otsu'` (gris) y `'adaptativo'` (para iluminación no uniforme).
+2. **Características** (`extraer_caracteristicas`), por cada contorno:
+   - Área y perímetro (px)
+   - Compacidad (`perímetro² / área`)
+   - Área de la partícula / área del contenedor
+   - Relación ancho/alto del contenedor
+   - Relación entre los ejes de la elipse ajustada
+   - Relación entre distancia mínima y máxima del centroide al contorno
+   - Apariencia: gris medio y saturación media dentro de la partícula
+3. **Entrenamiento:** cada partícula segmentada de `FRA.png`, `PEL.png` y `TAR.png` es una muestra de su clase. Las características se normalizan (`StandardScaler`) y se entrena un **K vecinos más cercanos** (k = 3) de scikit-learn.
+4. **Evaluación:** se segmenta `MPs_test.jpg` y se empareja cada anotación del CSV con la partícula más grande cuyo centroide cae dentro de su caja. Se calculan accuracy, precision, recall y F1 (medias ponderadas), el informe por clase y la **matriz de confusión**. También se cuentan las anotaciones sin partícula segmentada.
+
+La imagen de test **no** se usa para entrenar, solo para evaluar.
+
+### Decisión sobre las características
+Por defecto se usan solo las que no dependen del tamaño en píxeles (`CARACT_USADAS`), para que el clasificador no falle si las imágenes de entrenamiento y test tienen distinta resolución. Área y perímetro se calculan igualmente y se pueden añadir a la lista.
+
+### Resultados
+
+*(Rellenar tras ejecutar el notebook con las imágenes reales.)*
+
+| Métrica | Valor |
+|---|---|
+| Accuracy | |
+| Precision (ponderada) | |
+| Recall (ponderado) | |
+| F1 (ponderado) | |
+| Anotaciones sin segmentar | |
+
+Matriz de confusión: ver la celda de evaluación del notebook. Comentar qué clases se confunden y por qué.
+
+### Limitaciones
+- Partículas pegadas se segmentan como un solo contorno.
+- Iluminación no uniforme o poco contraste degradan la segmentación (probar `'adaptativo'`).
+- Pocas muestras de entrenamiento limitan lo que puede aprender el KNN.
+- El alquitrán (oscuro) y algunos fragmentos oscuros pueden solaparse en las características de intensidad.
+
+### Posibles mejoras
+Separar partículas pegadas con *watershed*, aumentar el número de muestras de entrenamiento y añadir más descriptores de color o textura.
+
+---
+
+## Nota sobre aprendizaje profundo
+No se utiliza ningún modelo de aprendizaje profundo, ni para segmentar ni para clasificar. Todo se basa en umbralizado, contornos y características geométricas y de apariencia, con un KNN clásico para la clasificación.
