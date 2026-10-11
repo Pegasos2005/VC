@@ -1,6 +1,10 @@
-# Práctica 3 – Visión por Computador
+# Práctica de Detección y reconocimiento de formas
 
-Detección de monedas y clasificación de microplásticos con OpenCV, **sin aprendizaje profundo**.
+## GitHub Autores:
+Tomás: https://github.com/Pegasos2005
+Helen: https://github.com/heleengb
+
+Detección de monedas y clasificación de microplásticos con OpenCV.
 
 ## Contenido
 
@@ -57,7 +61,7 @@ Tras calibrar: verde = moneda reconocida, rojo con `?` = no encaja con ninguna m
 - **Fondo:** necesita contraste con las monedas. Monedas de cobre sobre madera es un caso difícil; un folio blanco o superficie lisa oscura funciona mucho mejor.
 - **Resolución:** si las monedas ocupan pocos píxeles, 1 px de error son varias décimas de mm y se confunden las de tamaño parecido.
 
-> Nota: estas observaciones se basan en las limitaciones del método. Conviene contrastarlas y ampliarlas con las pruebas reales con la cámara.
+![Funcionamiento de la primera tarea](./tarea1.gif)
 
 ---
 
