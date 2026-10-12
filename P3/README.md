@@ -1,8 +1,10 @@
 # Práctica de Detección y reconocimiento de formas
 
-## GitHub Autores:
-Tomás: https://github.com/Pegasos2005
-Helen: https://github.com/heleengb
+## Autores:
+
+#### Grupo G43
+Cristian Tomás Vega Appelqvist [[GitHub](https://github.com/Pegasos2005)]  
+Helena González Báez [[GitHub](https://github.com/heleengb)]
 
 Detección de monedas y clasificación de microplásticos con OpenCV.
 
@@ -13,7 +15,6 @@ Detección de monedas y clasificación de microplásticos con OpenCV.
 | `VC_P3_resuelto.ipynb` | Notebook de la práctica con las celdas originales y las soluciones de las dos tareas |
 | `README.md` | Este documento |
 
-Archivos de datos necesarios, en la misma carpeta que el notebook: `Monedas.jpg`, `MPs_test.jpg`, `MPs_test_bbs.csv`, `FRA.png`, `PEL.png`, `TAR.png`.
 
 ## Requisitos
 
@@ -106,3 +107,10 @@ Por defecto se usan solo las que no dependen del tamaño en píxeles (`CARACT_US
 
 ### Posibles mejoras
 Separar partículas pegadas con *watershed*, aumentar el número de muestras de entrenamiento y añadir más descriptores de color o textura.
+
+## Conclusiones
+Este proyecto demuestra con éxito la resolución de tareas de conteo y clasificación mediante visión por computador clásica y heurísticas geométricas, sin el uso de aprendizaje profundo.
+
+**Logros principales:** Conseguimos crear una segmentación robusta por contornos, calibración interactiva basada en referencias reales, extracción de descriptores geométricos y visuales (estilo SMACC) y un demostrador funcional en tiempo real para vídeo.   
+
+**Retos y futuro:** El sistema es sensible a cambios de iluminación y oclusiones/solapes entre objetos. Como mejora, se propone añadir compensación lumínica y algoritmos para separar elementos superpuestos. 
