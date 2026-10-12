@@ -87,8 +87,6 @@ Por defecto se usan solo las que no dependen del tamaño en píxeles (`CARACT_US
 
 ### Resultados
 
-*(Rellenar tras ejecutar el notebook con las imágenes reales.)*
-
 | Métrica | Valor |
 |---|---|
 | Accuracy | |
@@ -97,7 +95,7 @@ Por defecto se usan solo las que no dependen del tamaño en píxeles (`CARACT_US
 | F1 (ponderado) | |
 | Anotaciones sin segmentar | |
 
-Matriz de confusión: ver la celda de evaluación del notebook. Comentar qué clases se confunden y por qué.
+![Funcionamiento de la primera tarea](./matriz150.png)
 
 ### Limitaciones
 - Partículas pegadas se segmentan como un solo contorno.
@@ -107,8 +105,3 @@ Matriz de confusión: ver la celda de evaluación del notebook. Comentar qué cl
 
 ### Posibles mejoras
 Separar partículas pegadas con *watershed*, aumentar el número de muestras de entrenamiento y añadir más descriptores de color o textura.
-
----
-
-## Nota sobre aprendizaje profundo
-No se utiliza ningún modelo de aprendizaje profundo, ni para segmentar ni para clasificar. Todo se basa en umbralizado, contornos y características geométricas y de apariencia, con un KNN clásico para la clasificación.
