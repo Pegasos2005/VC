@@ -96,6 +96,7 @@ Por defecto se usan solo las que no dependen del tamaño en píxeles (`CARACT_US
 | Anotaciones sin segmentar | 71 |
 
 ![Matriz de confusión de la segunda tarea](./matriz150.png)
+![Matriz de confusión de la segunda tarea](./resultados_tarea2.png)
 
 ### Limitaciones
 - Partículas pegadas se segmentan como un solo contorno.
