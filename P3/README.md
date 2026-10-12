@@ -89,17 +89,17 @@ Por defecto se usan solo las que no dependen del tamaño en píxeles (`CARACT_US
 
 | Métrica | Valor |
 |---|---|
-| Accuracy | |
-| Precision (ponderada) | |
-| Recall (ponderado) | |
-| F1 (ponderado) | |
-| Anotaciones sin segmentar | |
+| Accuracy | 0.755 |
+| Precision (ponderada) | 0.822 |
+| Recall (ponderado) | 0.755 |
+| F1 (ponderado) | 0.749 |
+| Anotaciones sin segmentar | 71 |
 
-![Funcionamiento de la primera tarea](./matriz150.png)
+![Matriz de confusión de la segunda tarea](./matriz150.png)
 
 ### Limitaciones
 - Partículas pegadas se segmentan como un solo contorno.
-- Iluminación no uniforme o poco contraste degradan la segmentación (probar `'adaptativo'`).
+- Iluminación no uniforme o poco contraste degradan la segmentación.
 - Pocas muestras de entrenamiento limitan lo que puede aprender el KNN.
 - El alquitrán (oscuro) y algunos fragmentos oscuros pueden solaparse en las características de intensidad.
 
