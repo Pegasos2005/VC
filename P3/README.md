@@ -66,51 +66,59 @@ Tras calibrar: verde = moneda reconocida, rojo con `?` = no encaja con ninguna m
 
 ---
 
-## Tarea 2: Clasificación de microplásticos (FRA / PEL / TAR)
+### Tarea 2 – Clasificación de microplásticos (FRA / PEL / TAR)
 
-### Pipeline
-1. **Segmentación** (`segmentar_particulas`): se estima el color de fondo como la mediana de la imagen (las partículas son minoría), se mide la distancia de cada píxel a ese color y se aplica Otsu. Así funciona igual con partículas más claras u oscuras que el fondo. Después, morfología y contornos externos con un área mínima (`AREA_MIN_MP`, a ajustar según la resolución). Hay otros dos métodos seleccionables con `METODO_SEG`: `'otsu'` (gris) y `'adaptativo'` (para iluminación no uniforme).
-2. **Características** (`extraer_caracteristicas`), por cada contorno:
-   - Área y perímetro (px)
-   - Compacidad (`perímetro² / área`)
-   - Área de la partícula / área del contenedor
-   - Relación ancho/alto del contenedor
-   - Relación entre los ejes de la elipse ajustada
-   - Relación entre distancia mínima y máxima del centroide al contorno
-   - Apariencia: gris medio y saturación media dentro de la partícula
-3. **Entrenamiento:** cada partícula segmentada de `FRA.png`, `PEL.png` y `TAR.png` es una muestra de su clase. Las características se normalizan (`StandardScaler`) y se entrena un **K vecinos más cercanos** (k = 3) de scikit-learn.
-4. **Evaluación:** se segmenta `MPs_test.jpg` y se empareja cada anotación del CSV con la partícula más grande cuyo centroide cae dentro de su caja. Se calculan accuracy, precision, recall y F1 (medias ponderadas), el informe por clase y la **matriz de confusión**. También se cuentan las anotaciones sin partícula segmentada.
+Pipeline clásico de visión por computador (sin aprendizaje profundo / *deep learning*) que segmenta partículas de microplásticos en una imagen y clasifica cada una como FRA (fragmento), PEL (pellet) o TAR (alquitrán). Se encuentra en la última sección de `VC_P3_mejorado.ipynb`.
 
-La imagen de test **no** se usa para entrenar, solo para evaluar.
+#### Archivos
+| Archivo | Propósito |
+| :--- | :--- |
+| `VC_P3_mejorado.ipynb` | Cuaderno (*notebook*) con la solución completa |
+| `fragment-03-olympus-10-01-2020.JPG` | Imagen de entrenamiento, FRA (2576×1932) |
+| `pellet-03-olympus-10-01-2020.JPG` | Imagen de entrenamiento, PEL |
+| `tar-03-olympus-10-01-2020.JPG` | Imagen de entrenamiento, TAR |
+| `MPs_test.jpg` | Escaneo de prueba (790×1186) |
+| `MPs_test_bbs.csv` | Anotaciones de prueba (etiqueta, x_min, y_min, x_max, y_max, 120 partículas) |
 
-### Decisión sobre las características
-Por defecto se usan solo las que no dependen del tamaño en píxeles (`CARACT_USADAS`), para que el clasificador no falle si las imágenes de entrenamiento y test tienen distinta resolución. Área y perímetro se calculan igualmente y se pueden añadir a la lista.
+#### Requisitos
+`opencv-python`, `numpy`, `scipy`, `scikit-image`, `scikit-learn`, `matplotlib`, `seaborn`, `pandas`.
 
-### Resultados
+#### Pipeline (Flujo de procesamiento)
+1. **Estimación del fondo**. Un filtro de mediana grande (`KERNEL_FONDO = 41`) sobre la imagen en el espacio Lab proporciona un fondo local que absorbe el viñeteado y las rayas del escáner.
+2. **Segmentación**. Se calcula la distancia euclidiana de cada píxel a ese fondo en el espacio CIELAB, de modo que se tienen en cuenta los cambios de luminosidad y tono/saturación. Un umbral por histéresis (`UMBRAL_BAJO = 10`, `UMBRAL_ALTO = 14`) conserva los *blobs* (regiones) que contienen al menos un píxel fuerte y los expande hasta sus bordes pálidos. Luego se rellenan los huecos, se aplica una apertura morfológica de 3×3 y se descartan los contornos más pequeños que `AREA_MIN_MP`.
+3. **Extracción de características** (por contorno):
+   * **Forma** (basado en el artículo SMACC): compacidad, proporción área/caja delimitadora (*bounding-box*), relación de aspecto del *bounding-box*, relación de los ejes de la elipse asimilada, relación de distancia mínima/máxima al centroide, además de la solidez y circularidad.
+   * **Color** relativo al fondo local, medido en el interior erosionado: ΔL, Δa, Δb, croma, desviación estándar de L, mínimo de L.
+4. **Entrenamiento**. Las tres imágenes completas se reescalan por `ESCALA_TRAIN = 0.56` para que las partículas tengan el mismo tamaño en píxeles que en el escaneo de prueba. Cada partícula segmentada es una muestra (aproximadamente 72 FRA, 55 PEL, 53 TAR). Las características se estandarizan y se ajusta un clasificador kNN (k = 5).
+5. **Evaluación**. Cada caja (*box*) anotada se empareja con el contorno más grande cuyo centroide cae dentro de ella. Se generan las métricas de exactitud (*accuracy*), precisión, exhaustividad (*recall*), F1, la matriz de confusión y una imagen superpuesta codificada por colores. La imagen de prueba nunca se utiliza para el entrenamiento.
 
-| Métrica | Valor |
-|---|---|
-| Accuracy | 0.755 |
-| Precision (ponderada) | 0.822 |
-| Recall (ponderado) | 0.755 |
-| F1 (ponderado) | 0.749 |
-| Anotaciones sin segmentar | 71 |
+#### Parámetros clave
+| Parámetro | Valor | Significado |
+| :--- | :--- | :--- |
+| `UMBRAL_BAJO` / `UMBRAL_ALTO` | 10 / 14 | Umbrales de histéresis sobre la distancia Lab |
+| `KERNEL_FONDO` | 41 px | Tamaño de la mediana del fondo; debe superar a la partícula más grande |
+| `AREA_MIN_MP` | 80 px | Área mínima de la partícula a la resolución de prueba |
+| `ESCALA_TRAIN` | 0.56 | Factor de redimensionamiento para las fotos de entrenamiento |
 
-![Matriz de confusión de la segunda tarea](./matriz150.png)
-![Matriz de confusión de la segunda tarea](./resultados_tarea2.png)
+**Elección de AREA_MIN_MP**: aproximadamente 0,2 × el área mediana de los *pellets*. Por debajo de unos 50 px solo aparece polvo y ruido; las partículas reales comienzan alrededor de los 150 px (exceptuando las fibras finas). Si cambias la resolución de la imagen, debes escalar este valor de forma proporcional.
 
-### Limitaciones
-- Partículas pegadas se segmentan como un solo contorno.
-- Iluminación no uniforme o poco contraste degradan la segmentación.
-- Pocas muestras de entrenamiento limitan lo que puede aprender el KNN.
-- El alquitrán (oscuro) y algunos fragmentos oscuros pueden solaparse en las características de intensidad.
+#### Resultados en MPs_test.jpg
+| Métrica | Versión anterior | Esta versión |
+| :--- | :--- | :--- |
+| Partículas anotadas detectadas (de 120) | 49 | 116 |
+| Exactitud (*Accuracy*) en partículas detectadas | 0.76 | 0.78 |
+| Exactitud sobre el total de 120 (omisiones = errores) | ≈ 0.31 | ≈ 0.76 |
 
-### Posibles mejoras
-Separar partículas pegadas con *watershed*, aumentar el número de muestras de entrenamiento y añadir más descriptores de color o textura.
+* **Por clase** (esta versión, partículas detectadas): FRA precisión 0.76 / *recall* 0.94; PEL 0.80 / 0.65; TAR 1.00 / 0.47.
+* **Comparativa de segmentación** (partículas anotadas detectadas, `AREA_MIN` = 80): escala de grises + Otsu = 37, escala de grises + umbral adaptativo = 60, distancia Lab + histéresis = 116.
 
-## Conclusiones
-Este proyecto demuestra con éxito la resolución de tareas de conteo y clasificación mediante visión por computador clásica y heurísticas geométricas, sin el uso de aprendizaje profundo.
+#### Limitaciones conocidas
+* **Cámara vs escáner**. Las fotos de entrenamiento provienen de una cámara y la prueba de un escáner, por lo que el color y el contraste difieren. Las características de color relativas al fondo mitigan esto, pero no lo eliminan por completo.
+* **Sesgo residual hacia FRA**. Los *pellets* muy pálidos pierden su forma redonda al ser segmentados, y los alquitranes (TAR) alargados y de tono amarronado son menos oscuros que el alquitrán de entrenamiento, por lo que ambos terminan etiquetados erróneamente como FRA.
+* Las partículas que se tocan se fusionan en un solo contorno (esto provoca al menos una omisión en la detección).
+* **Probado y descartado**: un cierre morfológico más grande (fusiona partículas vecinas, 5 detecciones menos) y características de dirección de tono normalizadas (peor *recall* en la clase PEL).
 
-**Logros principales:** Conseguimos crear una segmentación robusta por contornos, calibración interactiva basada en referencias reales, extracción de descriptores geométricos y visuales (estilo SMACC) y un demostrador funcional en tiempo real para vídeo.   
-
-**Retos y futuro:** El sistema es sensible a cambios de iluminación y oclusiones/solapes entre objetos. Como mejora, se propone añadir compensación lumínica y algoritmos para separar elementos superpuestos. 
+#### Posibles mejoras
+* Añadir algunas partículas etiquetadas procedentes del escáner al conjunto de entrenamiento.
+* Separar las partículas que se tocan utilizando una transformación de distancia y el algoritmo *watershed* (cuencas hidrográficas).
+* Añadir características de textura o de brillos especulares (reflejos).
