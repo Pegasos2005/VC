@@ -90,6 +90,11 @@ Pipeline clásico de visión por computador (sin aprendizaje profundo / *deep le
    * **Forma** (basado en el artículo SMACC): compacidad, proporción área/caja delimitadora (*bounding-box*), relación de aspecto del *bounding-box*, relación de los ejes de la elipse asimilada, relación de distancia mínima/máxima al centroide, además de la solidez y circularidad.
    * **Color** relativo al fondo local, medido en el interior erosionado: ΔL, Δa, Δb, croma, desviación estándar de L, mínimo de L.
 4. **Entrenamiento**. Las tres imágenes completas se reescalan por `ESCALA_TRAIN = 0.56` para que las partículas tengan el mismo tamaño en píxeles que en el escaneo de prueba. Cada partícula segmentada es una muestra (aproximadamente 72 FRA, 55 PEL, 53 TAR). Las características se estandarizan y se ajusta un clasificador kNN (k = 5).
+
+![Primera imagen entrenamiento](./fragment-03-olympus-10-01-2020.JPG)
+![Segunda imagen entrenamiento](./pellet-03-olympus-10-01-2020.JPG)
+![Tercera imagen entrenamiento](./tar-03-olympus-10-01-2020.JPG)
+
 5. **Evaluación**. Cada caja (*box*) anotada se empareja con el contorno más grande cuyo centroide cae dentro de ella. Se generan las métricas de exactitud (*accuracy*), precisión, exhaustividad (*recall*), F1, la matriz de confusión y una imagen superpuesta codificada por colores. La imagen de prueba nunca se utiliza para el entrenamiento.
 
 #### Parámetros clave
@@ -111,6 +116,11 @@ Pipeline clásico de visión por computador (sin aprendizaje profundo / *deep le
 
 * **Por clase** (esta versión, partículas detectadas): FRA precisión 0.76 / *recall* 0.94; PEL 0.80 / 0.65; TAR 1.00 / 0.47.
 * **Comparativa de segmentación** (partículas anotadas detectadas, `AREA_MIN` = 80): escala de grises + Otsu = 37, escala de grises + umbral adaptativo = 60, distancia Lab + histéresis = 116.
+
+
+![Matriz de confusión](./matriz_confusion.png)
+![Resultados del entrenamiento](./resultados_entrenamiento.png)
+![Resultados de la imagen test final](./resultados_tarea2.png)
 
 #### Limitaciones conocidas
 * **Cámara vs escáner**. Las fotos de entrenamiento provienen de una cámara y la prueba de un escáner, por lo que el color y el contraste difieren. Las características de color relativas al fondo mitigan esto, pero no lo eliminan por completo.
