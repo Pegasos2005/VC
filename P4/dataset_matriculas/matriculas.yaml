@@ -1,0 +1,7 @@
+path: C:/Users/Usuario/Desktop/puta_uni/PracticasVC/VC/P4/dataset_matriculas
+train: train/images
+val: val/images
+test: test/images
+
+nc: 1
+names: ['matricula']

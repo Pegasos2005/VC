@@ -1,0 +1,215 @@
+id,clase,frames,direccion,salida
+1,coche,223,izquierda,desaparece dentro
+2,coche,75,parado,desaparece dentro
+3,coche,29,parado,desaparece dentro
+11,coche,344,parado,desaparece dentro
+13,persona,312,derecha,desaparece dentro
+16,coche,36,parado,desaparece dentro
+21,coche,302,parado,desaparece dentro
+29,coche,265,parado,desaparece dentro
+34,camion,14,parado,desaparece dentro
+39,coche,223,parado,desaparece dentro
+46,coche,5,parado,desaparece dentro
+49,coche,160,parado,desaparece dentro
+51,coche,5,parado,desaparece dentro
+55,coche,15,parado,desaparece dentro
+57,persona,25,parado,desaparece dentro
+60,persona,369,derecha,desaparece dentro
+61,persona,455,derecha,desaparece dentro
+63,coche,21,parado,desaparece dentro
+65,coche,141,izquierda,desaparece dentro
+66,coche,63,parado,desaparece dentro
+69,coche,7,parado,desaparece dentro
+79,moto,19,izquierda,desaparece dentro
+82,persona,14,izquierda,desaparece dentro
+92,coche,14,parado,desaparece dentro
+96,coche,368,izquierda,izquierda
+97,coche,5,parado,desaparece dentro
+99,coche,211,parado,desaparece dentro
+102,coche,13,parado,desaparece dentro
+108,coche,207,parado,desaparece dentro
+111,coche,181,parado,desaparece dentro
+113,persona,7,parado,desaparece dentro
+114,coche,117,parado,desaparece dentro
+116,coche,198,parado,desaparece dentro
+125,coche,179,parado,desaparece dentro
+127,coche,194,parado,desaparece dentro
+128,coche,23,parado,desaparece dentro
+130,persona,5,parado,desaparece dentro
+135,coche,128,parado,desaparece dentro
+136,coche,67,parado,desaparece dentro
+139,coche,184,izquierda,desaparece dentro
+142,coche,7,parado,desaparece dentro
+145,coche,16,parado,desaparece dentro
+149,coche,210,parado,desaparece dentro
+151,coche,18,parado,desaparece dentro
+155,coche,58,parado,desaparece dentro
+157,coche,263,parado,desaparece dentro
+158,moto,209,derecha,derecha
+160,coche,132,parado,desaparece dentro
+169,coche,16,parado,desaparece dentro
+170,coche,12,parado,desaparece dentro
+172,coche,96,parado,desaparece dentro
+177,coche,49,parado,desaparece dentro
+178,persona,51,parado,desaparece dentro
+184,coche,23,parado,desaparece dentro
+192,coche,210,izquierda,izquierda
+194,coche,96,parado,desaparece dentro
+198,coche,156,parado,desaparece dentro
+200,coche,122,parado,desaparece dentro
+201,coche,31,parado,desaparece dentro
+203,coche,130,parado,desaparece dentro
+204,coche,108,parado,desaparece dentro
+208,coche,76,parado,desaparece dentro
+212,coche,73,parado,desaparece dentro
+213,persona,11,parado,desaparece dentro
+214,coche,334,izquierda,desaparece dentro
+215,coche,12,parado,desaparece dentro
+216,persona,5,parado,desaparece dentro
+217,coche,8,parado,desaparece dentro
+222,coche,13,parado,desaparece dentro
+224,coche,6,parado,desaparece dentro
+225,coche,211,parado,desaparece dentro
+232,coche,215,parado,desaparece dentro
+238,coche,237,izquierda,izquierda
+241,coche,8,parado,desaparece dentro
+242,coche,23,parado,desaparece dentro
+243,coche,11,parado,desaparece dentro
+245,coche,195,parado,desaparece dentro
+248,coche,126,parado,desaparece dentro
+250,persona,184,derecha,desaparece dentro
+252,coche,40,parado,desaparece dentro
+253,persona,431,parado,izquierda
+254,coche,83,parado,desaparece dentro
+260,coche,46,parado,desaparece dentro
+267,coche,185,izquierda,desaparece dentro
+270,coche,15,parado,desaparece dentro
+273,coche,7,parado,desaparece dentro
+274,coche,21,parado,desaparece dentro
+275,coche,5,parado,desaparece dentro
+277,coche,124,izquierda,izquierda
+281,coche,62,parado,desaparece dentro
+282,coche,157,parado,desaparece dentro
+284,coche,7,parado,desaparece dentro
+288,coche,5,parado,desaparece dentro
+291,coche,216,parado,desaparece dentro
+293,coche,17,parado,desaparece dentro
+303,coche,132,izquierda,izquierda
+307,coche,143,parado,desaparece dentro
+310,coche,5,parado,desaparece dentro
+317,coche,116,parado,desaparece dentro
+330,coche,6,parado,desaparece dentro
+332,coche,82,parado,desaparece dentro
+334,coche,21,parado,desaparece dentro
+336,coche,17,parado,desaparece dentro
+338,coche,122,derecha,derecha
+342,persona,244,derecha,desaparece dentro
+344,persona,32,parado,desaparece dentro
+346,coche,15,parado,desaparece dentro
+347,coche,73,izquierda,desaparece dentro
+349,coche,13,parado,desaparece dentro
+351,coche,17,parado,desaparece dentro
+352,coche,7,parado,desaparece dentro
+365,coche,121,derecha,desaparece dentro
+377,coche,48,parado,desaparece dentro
+384,moto,132,derecha,derecha
+386,persona,160,derecha,desaparece dentro
+392,coche,46,parado,desaparece dentro
+395,coche,45,parado,desaparece dentro
+397,coche,168,parado,desaparece dentro
+399,coche,8,parado,desaparece dentro
+404,coche,46,parado,desaparece dentro
+406,coche,42,izquierda,desaparece dentro
+410,moto,14,izquierda,desaparece dentro
+413,coche,17,parado,desaparece dentro
+414,coche,83,parado,desaparece dentro
+415,persona,64,derecha,desaparece dentro
+416,coche,130,izquierda,izquierda
+419,coche,12,parado,desaparece dentro
+422,moto,145,derecha,derecha
+428,coche,28,parado,desaparece dentro
+429,coche,39,parado,desaparece dentro
+432,coche,8,parado,desaparece dentro
+434,coche,48,parado,desaparece dentro
+436,coche,29,parado,desaparece dentro
+438,coche,9,parado,desaparece dentro
+444,coche,5,parado,desaparece dentro
+448,coche,49,parado,desaparece dentro
+450,coche,125,izquierda,izquierda
+456,coche,221,derecha,derecha
+460,coche,36,parado,desaparece dentro
+463,coche,246,parado,desaparece dentro
+466,persona,13,parado,desaparece dentro
+469,coche,154,izquierda,izquierda
+473,coche,54,parado,desaparece dentro
+481,coche,297,parado,desaparece dentro
+484,coche,271,parado,desaparece dentro
+487,coche,250,parado,desaparece dentro
+491,coche,248,parado,desaparece dentro
+501,coche,46,parado,desaparece dentro
+508,persona,41,parado,derecha
+509,persona,17,parado,desaparece dentro
+510,camion,196,izquierda,izquierda/arriba
+512,coche,38,parado,desaparece dentro
+516,coche,7,parado,desaparece dentro
+517,coche,6,parado,izquierda
+521,persona,45,parado,desaparece dentro
+525,coche,9,parado,desaparece dentro
+532,coche,47,parado,desaparece dentro
+534,bicicleta,59,izquierda,desaparece dentro
+535,coche,355,izquierda,desaparece dentro
+540,coche,254,izquierda,izquierda
+541,coche,5,parado,desaparece dentro
+547,coche,9,parado,desaparece dentro
+561,bicicleta,39,izquierda,izquierda
+563,coche,11,parado,desaparece dentro
+565,persona,29,izquierda,izquierda
+566,coche,7,parado,desaparece dentro
+569,coche,227,parado,desaparece dentro
+571,moto,56,izquierda,izquierda
+578,coche,216,parado,desaparece dentro
+587,persona,31,izquierda,izquierda
+589,coche,224,parado,desaparece dentro
+594,coche,15,parado,desaparece dentro
+595,coche,160,parado,desaparece dentro
+597,coche,23,parado,desaparece dentro
+599,persona,62,derecha,desaparece dentro
+601,coche,29,parado,desaparece dentro
+603,coche,19,parado,desaparece dentro
+606,coche,11,parado,desaparece dentro
+608,coche,24,parado,desaparece dentro
+611,coche,265,izquierda,izquierda
+614,coche,32,parado,desaparece dentro
+615,coche,355,izquierda,desaparece dentro
+617,coche,8,parado,desaparece dentro
+620,coche,10,parado,desaparece dentro
+625,coche,5,parado,desaparece dentro
+635,coche,22,parado,desaparece dentro
+636,coche,263,parado,desaparece dentro
+640,coche,261,parado,desaparece dentro
+643,coche,244,parado,desaparece dentro
+645,coche,204,parado,desaparece dentro
+647,coche,309,derecha,derecha
+651,coche,162,parado,desaparece dentro
+653,coche,139,izquierda,desaparece dentro
+660,coche,11,parado,desaparece dentro
+663,coche,119,izquierda,desaparece dentro
+668,persona,222,derecha,desaparece dentro
+671,coche,56,parado,desaparece dentro
+673,coche,43,parado,desaparece dentro
+674,coche,215,izquierda,desaparece dentro
+677,coche,177,parado,sigue en imagen
+678,coche,53,parado,desaparece dentro
+679,coche,48,parado,desaparece dentro
+685,coche,7,parado,desaparece dentro
+690,coche,20,parado,desaparece dentro
+697,coche,169,izquierda,sigue en imagen
+698,coche,35,parado,desaparece dentro
+702,coche,31,parado,desaparece dentro
+704,coche,7,parado,desaparece dentro
+707,coche,5,parado,desaparece dentro
+708,coche,86,parado,sigue en imagen
+710,coche,61,parado,sigue en imagen
+715,coche,37,parado,sigue en imagen
+717,coche,5,parado,desaparece dentro
+718,coche,7,parado,desaparece dentro
