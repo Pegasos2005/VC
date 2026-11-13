@@ -1,0 +1,3 @@
+modelo,recortes con matrícula,% recortes,confianza media,ms por recorte
+YOLO11n,99,5.354,0.629,46.875
+RT-DETR-L,417,22.553,0.551,569.127

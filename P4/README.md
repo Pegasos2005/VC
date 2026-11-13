@@ -25,6 +25,7 @@ Todo el código está en el cuaderno [`VC_P4.ipynb`](VC_P4.ipynb). El reconocimi
 | *Extra:* flujo por dirección | [4.1](#41-flujo-por-dirección-resultadosflujocsv) |
 | *Extra:* anonimización | [4.2](#42-anonimización-resultadosanonimizadomp4) |
 | *Extra:* detección de matrículas por contornos | [4.3](#43-detección-de-matrículas-mediante-contornos) |
+| *Extra:* detección de matrículas con YOLO y con RT-DETR | [4.4](#44-detección-de-matrículas-yolo11n-frente-a-rt-detr-l) |
 
 ## Contenido de la carpeta
 
@@ -227,6 +228,55 @@ prácticamente igual que el mAP@0.5 de Ultralytics (0,619), lo que confirma que 
   porque los caracteres no llegan a formar bordes. A partir de 40 px, YOLO supera el 94 % de recall y los contornos se quedan entre el 41 y el 60 %.
 - Los fallos típicos de los contornos son matrículas inclinadas o en perspectiva (la proporción sale del rango), con poco contraste,
   o pegadas a otros elementos con muchos bordes (parachoques, rejillas), que el cierre morfológico une con la matrícula.
+
+### 4.4 Detección de matrículas: YOLO11n frente a RT-DETR-L
+
+Cuadernos: [`VC_P4_RTDETR_colab.ipynb`](VC_P4_RTDETR_colab.ipynb) (entrenamiento) y [`VC_P4_RTDETR.ipynb`](VC_P4_RTDETR.ipynb) (análisis y evaluación).
+
+RT-DETR es un detector basado en *transformers*, de Baidu, sin NMS. Se ha usado su implementación en Ultralytics (`RTDETR('rtdetr-l.pt')`, preentrenado en COCO),
+así que el dataset, el `.yaml`, las métricas y la evaluación son exactamente los mismos que con YOLO.
+
+**Entrenamiento.** En CPU habría tardado días, así que se entrenó en **Google Colab con una GPU Tesla T4**. Tardó **77 minutos**.
+Los ajustes son los mismos que en YOLO11n: `imgsz=640`, 40 épocas, `patience=10`, mismo reparto train/val/test y optimizador elegido automáticamente (AdamW).
+El *batch* es de 8 en lugar de 16, por la memoria de la GPU. Los resultados están en `runs/detect/matriculas_rtdetr_l/`.
+
+![Curvas de entrenamiento de RT-DETR](runs/detect/matriculas_rtdetr_l/results.png)
+
+![Métricas de validación por época: YOLO11n frente a RT-DETR-L](imagenes/rtdetr_curvas.png)
+
+- RT-DETR **aprende mucho más rápido**: en la época 1 ya tiene un mAP@0.5 de 0,58 en validación, que YOLO11n no alcanza hasta la época 13.
+  Supera a YOLO en *recall* y mAP durante todo el entrenamiento.
+- Es menos estable al principio. En la época 7 hay una caída puntual de todas las métricas, típica de los *transformers*, y se recupera en la siguiente.
+- Como en YOLO, la mejor época es la última (mAP@0.5 de validación 0,762 frente a 0,658), así que **todavía no había convergido**.
+- Las pérdidas de validación salen `nan` en 26 de las 40 épocas, por eso hay huecos en esas gráficas. Es un problema del cálculo de esa pérdida
+  en Ultralytics con precisión mixta (AMP). No afecta a las métricas, que se calculan en todas las épocas.
+
+**Resultados en test** (mismas 477 imágenes y 1045 matrículas; inferencia medida por Ultralytics en CPU, Ryzen AI 7 445):
+
+| Modelo | Parámetros | Pesos | Precisión | Recall | mAP@0.5 | mAP@0.5:0.95 | Inferencia CPU |
+|---|---|---|---|---|---|---|---|
+| YOLO11n | **2,6 M** | **5,5 MB** | **0,89** | 0,60 | 0,619 | 0,333 | **19 ms/img** |
+| RT-DETR-L | 32,8 M | 66 MB | 0,88 | **0,70** | **0,705** | **0,400** | 492 ms/img |
+
+![Ejemplos en test: YOLO11n arriba, RT-DETR-L abajo](imagenes/rtdetr_ejemplos.jpg)
+
+*Ejemplos de test (arriba YOLO11n, abajo RT-DETR-L). RT-DETR encuentra matrículas pequeñas y lejanas que YOLO no detecta, como las del aparcamiento o la de la moto.*
+
+**En el vídeo de test** (1 de cada 10 fotogramas; vehículos detectados con `yolo11n` y la matrícula buscada en cada recorte con ambos modelos, a `imgsz=640`),
+RT-DETR encuentra matrícula en el **22,6 %** de los recortes de vehículo y YOLO11n en el **5,4 %**. Tarda 569 ms por recorte, frente a 47 ms.
+En los recortes en que no coinciden, RT-DETR detecta correctamente la matrícula del autobús, donde YOLO no ve nada:
+
+![Recortes del vídeo en que los modelos no coinciden](imagenes/rtdetr_video.jpg)
+
+**Conclusiones**
+
+- **RT-DETR-L es más preciso.** El mAP@0.5 sube un 14 % y el mAP@0.5:0.95 un 20 %. Sobre todo **encuentra más matrículas**
+  (*recall* de 0,60 a 0,70) sin perder precisión, que es justo el punto débil de YOLO11n: las matrículas pequeñas y lejanas.
+- **Es mucho más caro.** Tiene 12,6 veces más parámetros, es unas 26 veces más lento en CPU y no se puede entrenar sin GPU.
+  Para el prototipo en un portátil sin GPU, YOLO11n sigue siendo la opción práctica: procesar el vídeo con RT-DETR llevaría horas.
+  Con GPU, RT-DETR-L sería la mejor elección.
+- **Licencia:** el RT-DETR original de Baidu es Apache 2.0 y permite uso comercial sin publicar el código.
+  La implementación de Ultralytics usada aquí sigue siendo AGPL-3.0, así que para un producto habría que usar la implementación original.
 
 ## Entorno
 
