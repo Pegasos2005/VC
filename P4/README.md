@@ -7,14 +7,32 @@ Prototipo que procesa el vídeo de test de la práctica y hace lo siguiente:
 - cuenta los objetos de cada clase;
 - guarda un vídeo con los resultados, un vídeo anonimizado y un CSV con todas las detecciones.
 
-Todo el código está en el cuaderno [`VC_P4.ipynb`](VC_P4.ipynb).
+Todo el código está en el cuaderno [`VC_P4.ipynb`](VC_P4.ipynb). El reconocimiento de caracteres (segunda parte) está en [`../P4B`](../P4B/README.md).
+
+![Fragmento del vídeo resultado](imagenes/resultado.gif)
+
+## Resumen de la entrega
+
+| Requisito del enunciado | Dónde está |
+|---|---|
+| Detectar y seguir personas y vehículos | [Sección 3](#3-prototipo-sobre-el-vídeo-de-test), `resultados/resultado.mp4` |
+| Detectar las matrículas (detector entrenado) | [Secciones 1 y 2](#2-entrenamiento-del-detector-de-matrículas): dataset, entrenamiento y métricas |
+| Contar el total de cada clase | [Resultados](#resultados) |
+| Vídeo con los resultados | `resultados/resultado.mp4` (con OCR: `../P4B/resultados/resultado_ocr.mp4`) |
+| CSV con detección y seguimiento | `resultados/detecciones.csv` (con el texto de la matrícula: `../P4B/resultados/detecciones.csv`) |
+| Acceso al dataset y análisis del entrenamiento | [Sección 1](#1-dataset-de-matrículas) y [sección 2](#2-entrenamiento-del-detector-de-matrículas) |
+| **P4b:** texto de la matrícula en el CSV y en el vídeo, comparativa OCR clásico vs VLM | [README de P4B](../P4B/README.md) |
+| *Extra:* flujo por dirección | [4.1](#41-flujo-por-dirección-resultadosflujocsv) |
+| *Extra:* anonimización | [4.2](#42-anonimización-resultadosanonimizadomp4) |
+| *Extra:* detección de matrículas por contornos | [4.3](#43-detección-de-matrículas-mediante-contornos) |
 
 ## Contenido de la carpeta
 
 | Ruta | Descripción |
 |---|---|
 | `VC_P4.ipynb` | Cuaderno con todo el proceso: dataset, entrenamiento, prototipo y extras |
-| `dataset_matriculas/` | Dataset de matrículas en formato YOLO (train / val / test) y `matriculas.yaml` |
+| `dataset_matriculas/` | Dataset de matrículas en formato YOLO (train / val / test) y `matriculas.yaml`. **No se sube al repositorio** (ver [Acceso al dataset](#1-dataset-de-matrículas)) |
+| `VC_P4_contornos.ipynb` | Extra: detección de matrículas mediante contornos y comparación con YOLO |
 | `runs/detect/matriculas_yolo11n/` | Resultados del entrenamiento: pesos `best.pt`, curvas y métricas |
 | `resultados/resultado.mp4` | Vídeo de test con detecciones, IDs de seguimiento, matrículas y conteo |
 | `resultados/anonimizado.mp4` | Vídeo de test con personas y matrículas difuminadas (extra) |
@@ -22,6 +40,7 @@ Todo el código está en el cuaderno [`VC_P4.ipynb`](VC_P4.ipynb).
 | `resultados/flujo.csv` | Dirección y borde de salida de cada objeto seguido (extra) |
 
 > Los vídeos de `resultados/` se han reescalado de 1920×1080 a 1280×720 para no superar el límite de 100 MB por archivo de GitHub.
+> Después se recodificaron a H.264 para que se puedan reproducir en el navegador: `ffmpeg -i in.mp4 -c:v libopenh264 -b:v 3M -pix_fmt yuv420p out.mp4`.
 > El vídeo de entrada (`C0142.MP4`, 200 MB) no se incluye en el repositorio; es el vídeo de test proporcionado en el enunciado.
 
 ## 1. Dataset de matrículas
@@ -39,8 +58,13 @@ Todo el código está en el cuaderno [`VC_P4.ipynb`](VC_P4.ipynb).
 
 - Las imágenes se guardaron reescaladas a 1280 px de lado mayor. Las originales ocupaban unos 7 GB, y reducirlas acelera mucho el entrenamiento en CPU.
 
-**Acceso al dataset:** la versión ya preparada está en [`dataset_matriculas/`](dataset_matriculas/) en este repositorio.
-<!-- TODO: indicar aquí el origen de las imágenes originales (dataset_raw) -->
+**Acceso al dataset:** el dataset completo (imágenes originales y anotaciones `.json`) está en
+[Google Drive](https://drive.google.com/drive/folders/1RFd6sKH_QMQcpE_w5rWmy8rKiYUY5_SI).
+Por tamaño, no se incluye en el repositorio: ni las originales (~7 GB) ni la versión en formato YOLO (`dataset_matriculas/`, ~750 MB).
+
+Para reproducirlo, se descarga en `P4/dataset_raw/annotations/` (los `.json` en esa carpeta y las imágenes en `images/` dentro de ella)
+y se ejecuta la primera celda de código del cuaderno, que genera `dataset_matriculas/` con el mismo reparto (semilla fija).
+Además de la caja, cada `.json` incluye el texto de la matrícula (`plate`), que se usa en la [P4b](../P4B/README.md) para evaluar el OCR.
 
 ## 2. Entrenamiento del detector de matrículas
 
@@ -77,7 +101,9 @@ Todo el código está en el cuaderno [`VC_P4.ipynb`](VC_P4.ipynb).
 - **Matrículas:** se recorta cada vehículo con motor seguido, con un margen del 5 %, y se pasa el recorte al detector entrenado.
   Se queda la matrícula de mayor confianza. Así cada matrícula queda asociada a su vehículo y ocupa más píxeles en la entrada del detector.
 - **Conteo:** número de IDs de seguimiento distintos por clase. Solo cuentan los tracks que aparecen en al menos 5 fotogramas, para descartar IDs espurios.
-- **OCR:** la columna `texto_matricula` queda vacía, porque el reconocimiento de texto corresponde a la segunda parte de la práctica (P4b).
+- **OCR:** en esta carpeta la columna `texto_matricula` queda vacía. El reconocimiento de texto se hace en la [P4b](../P4B/README.md), que genera el CSV y el vídeo con las matrículas leídas.
+
+Vídeo completo: [`resultados/resultado.mp4`](resultados/resultado.mp4). Al principio de este README hay un fragmento de 5 s.
 
 ![Fotograma del resultado](imagenes/resultado_f1400.jpg)
 
@@ -145,7 +171,59 @@ También se indica por qué borde sale de la imagen.
 En la misma pasada se genera un segundo vídeo con desenfoque gaussiano sobre la caja de cada persona y sobre cada matrícula detectada.
 El tamaño del kernel se adapta al tamaño de la caja. Los vehículos se anonimizan difuminando su matrícula, que es el dato que identifica al propietario.
 
+![Fragmento del vídeo anonimizado](imagenes/anonimizado.gif)
+
+*Fragmento recortado: las personas de la acera y la matrícula del coche aparecen difuminadas. Vídeo completo: [`resultados/anonimizado.mp4`](resultados/anonimizado.mp4).*
+
 ![Fotograma anonimizado](imagenes/anonimizado_f1400.jpg)
+
+### 4.3 Detección de matrículas mediante contornos
+
+Cuaderno: [`VC_P4_contornos.ipynb`](VC_P4_contornos.ipynb). Es una alternativa clásica, sin entrenamiento, al detector YOLO de matrículas.
+Aprovecha que una matrícula es un rectángulo claro de proporción ~4,7:1 con caracteres oscuros que generan muchos bordes verticales juntos:
+
+1. *Black-hat* (13×5) para realzar los caracteres oscuros sobre fondo claro.
+2. Sobel en *x* para obtener los bordes verticales, y cierre morfológico horizontal (17×3) para unir los caracteres en un bloque.
+3. Umbral de Otsu, limpieza morfológica y una máscara de zonas claras (el fondo de la matrícula).
+4. `findContours` y filtrado del rectángulo envolvente: proporción entre 2 y 7, tamaño mínimo y máximo, y relleno ≥ 0,45.
+5. Puntuación de cada candidato: densidad de bordes × relleno × cercanía de la proporción a 4,5. Se procesa a 3 escalas y se fusiona con NMS.
+
+![Pasos del método de contornos](imagenes/contornos_pasos.jpg)
+
+Se evalúa en dos escenarios:
+
+- **imagen completa**;
+- **dentro de vehículos**, como en el prototipo: se detectan los vehículos con `yolo11n`, cada uno se reescala a 480 px de ancho
+  y la matrícula se busca solo en su 65 % inferior.
+
+Los parámetros se ajustaron en *val*. Los resultados son sobre las **mismas 477 imágenes de test** y con el **mismo evaluador** para ambos métodos
+(IoU ≥ 0,5, AP calculado a partir de la curva precisión-recall). El evaluador da para YOLO en imagen completa un AP50 de 0,618,
+prácticamente igual que el mAP@0.5 de Ultralytics (0,619), lo que confirma que la comparación es coherente.
+
+| Método | Escenario | Matrículas | AP50 | P | R | F1 | Recall máx. | ms/imagen |
+|---|---|---|---|---|---|---|---|---|
+| Contornos | imagen completa | 1045 | 0,135 | 0,385 | 0,201 | 0,264 | 0,268 | **9** |
+| YOLO | imagen completa | 1045 | **0,618** | 0,878 | 0,614 | **0,723** | 0,661 | 22 |
+| Contornos | dentro de vehículos | 942 | 0,259 | 0,503 | 0,357 | 0,417 | 0,412 | **7** |
+| YOLO | dentro de vehículos | 942 | 0,590 | 0,717 | 0,658 | 0,686 | **0,734** | 26 |
+
+*P, R y F1 en el umbral de F1 máximo. Los tiempos son en CPU (Ryzen AI 7 445) y no incluyen la detección de vehículos (25 ms/imagen).*
+
+![Contornos frente a YOLO](imagenes/contornos_vs_yolo.png)
+
+![Ejemplos de contornos y YOLO](imagenes/contornos_ejemplos.jpg)
+
+**Conclusiones**
+
+- **YOLO es muy superior**: en imagen completa su AP50 es 4,6 veces el de los contornos, y su F1 es 0,72 frente a 0,26.
+  Los contornos solo compiten en tiempo: son unas 2–3 veces más rápidos y no necesitan entrenamiento ni datos anotados.
+- **Buscar dentro del vehículo casi duplica el rendimiento de los contornos** (AP50 de 0,14 a 0,26). Se eliminan muchos falsos positivos
+  (rejillas, carteles, señales, marcas viales) y la matrícula se reescala a un tamaño más uniforme.
+  A YOLO no le aporta mucho porque ya distingue bien una matrícula de lo que no lo es.
+- **El tamaño vuelve a ser decisivo**: el 32 % de las matrículas de test mide menos de 20 px. Ahí los contornos no encuentran ninguna,
+  porque los caracteres no llegan a formar bordes. A partir de 40 px, YOLO supera el 94 % de recall y los contornos se quedan entre el 41 y el 60 %.
+- Los fallos típicos de los contornos son matrículas inclinadas o en perspectiva (la proporción sale del rango), con poco contraste,
+  o pegadas a otros elementos con muchos bordes (parachoques, rejillas), que el cierre morfológico une con la matrícula.
 
 ## Entorno
 
