@@ -31,7 +31,9 @@ Todo el código está en el cuaderno [`VC_P4.ipynb`](VC_P4.ipynb). El reconocimi
 | Ruta | Descripción |
 |---|---|
 | `VC_P4.ipynb` | Cuaderno con todo el proceso: dataset, entrenamiento, prototipo y extras |
-| `dataset_matriculas/` | Dataset de matrículas en formato YOLO (train / val / test) y `matriculas.yaml`. **No se sube al repositorio** (ver [Acceso al dataset](#1-dataset-de-matrículas)) |
+| `dataset_matriculas/` | Dataset de matrículas en formato YOLO (train / val / test) y `matriculas.yaml` |
+| `VC_P4_RTDETR.ipynb` | Extra: comparación YOLO11n vs RT-DETR-L (evaluación en local) |
+| `VC_P4_RTDETR_colab.ipynb` | Extra: entrenamiento de RT-DETR-L en Google Colab con GPU |
 | `VC_P4_contornos.ipynb` | Extra: detección de matrículas mediante contornos y comparación con YOLO |
 | `runs/detect/matriculas_yolo11n/` | Resultados del entrenamiento: pesos `best.pt`, curvas y métricas |
 | `resultados/resultado.mp4` | Vídeo de test con detecciones, IDs de seguimiento, matrículas y conteo |
@@ -58,12 +60,13 @@ Todo el código está en el cuaderno [`VC_P4.ipynb`](VC_P4.ipynb). El reconocimi
 
 - Las imágenes se guardaron reescaladas a 1280 px de lado mayor. Las originales ocupaban unos 7 GB, y reducirlas acelera mucho el entrenamiento en CPU.
 
-**Acceso al dataset:** el dataset completo (imágenes originales y anotaciones `.json`) está en
-[Google Drive](https://drive.google.com/drive/folders/1RFd6sKH_QMQcpE_w5rWmy8rKiYUY5_SI).
-Por tamaño, no se incluye en el repositorio: ni las originales (~7 GB) ni la versión en formato YOLO (`dataset_matriculas/`, ~750 MB).
+**Acceso al dataset:**
 
-Para reproducirlo, se descarga en `P4/dataset_raw/annotations/` (los `.json` en esa carpeta y las imágenes en `images/` dentro de ella)
-y se ejecuta la primera celda de código del cuaderno, que genera `dataset_matriculas/` con el mismo reparto (semilla fija).
+- La versión ya preparada en formato YOLO (imágenes a 1280 px, etiquetas y reparto) está en [`dataset_matriculas/`](dataset_matriculas/), en este repositorio.
+- El dataset original completo (imágenes a resolución original, ~7 GB, y anotaciones `.json`) está en
+  [Google Drive](https://drive.google.com/drive/folders/1RFd6sKH_QMQcpE_w5rWmy8rKiYUY5_SI).
+  Para regenerar `dataset_matriculas/`, se descarga en `P4/dataset_raw/annotations/` (los `.json` en esa carpeta y las imágenes en `images/` dentro de ella)
+  y se ejecuta la primera celda de código del cuaderno. El reparto es el mismo, porque usa semilla fija.
 Además de la caja, cada `.json` incluye el texto de la matrícula (`plate`), que se usa en la [P4b](../P4B/README.md) para evaluar el OCR.
 
 ## 2. Entrenamiento del detector de matrículas
