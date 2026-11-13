@@ -1,0 +1,1 @@
+Entrenamiento terminado. GPU: Tesla T4. Duración de esta sesión: 77 min

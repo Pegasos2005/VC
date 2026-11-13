@@ -1,0 +1,3 @@
+modelo,parámetros (M),pesos (MB),precisión,recall,mAP@0.5,mAP@0.5:0.95,inferencia (ms/img)
+YOLO11n,2.605,5.48,0.89,0.6,0.619,0.333,18.728
+RT-DETR-L,32.808,66.218,0.88,0.7,0.705,0.4,492.499
